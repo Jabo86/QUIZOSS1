@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulazione Concorso Operatore Socio Sanitario -</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            margin: 0;
+            padding: 20px;
+            color: #f0f0f0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700; }
+            to { text-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700; }
+        }
+
+        #timer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.5em;
+            color: #00eaff;
+            text-shadow: 0 0 5px #00eaff;
+        }
+
+        .question-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .question-box {
+            width: 40px;
+            height: 40px;
+            margin: 8px;
+            background: linear-gradient(45deg, #333, #555);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .question-box:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ffd700;
+        }
+
+        .question-box.answered {
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            box-shadow: 0 0 15px #ffd700;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        .question h3 {
+            margin: 0 0 15px 0;
+            color: #ffffff;
+            font-size: 1.6em;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+            line-height: 1.4;
+        }
+
+        .option {
+            margin: 10px 0;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: #ffffff;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateX(5px);
+        }
+
+        .option.correct {
+            background: linear-gradient(90deg, #00eaff, #00b8d4);
+            color: #fff;
+            box-shadow: 0 0 15px #00eaff;
+        }
+
+        .option.wrong {
+            background: linear-gradient(90deg, #ff5252, #d81b60);
+            color: #fff;
+            box-shadow: 0 0 15px #ff5252;
+        }
+
+        .lamp {
+            display: none;
+            margin-left: 15px;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            transition: transform 0.3s ease;
+        }
+
+        .lamp:hover {
+            transform: scale(1.2);
+        }
+
+        .explanation {
+            margin-top: 15px;
+            font-style: italic;
+            color: #f0f0f0;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.5s ease;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.2em;
+            box-shadow: 0 0 10px #ffd700;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-button:disabled {
+            background: #666;
+            color: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #ffd700;
+        }
+
+        button#submit {
+            display: block;
+            width: 250px;
+            margin: 20px auto;
+            padding: 15px;
+            background: linear-gradient(45deg, #00eaff, #00b8d4);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.3em;
+            box-shadow: 0 0 15px #00eaff;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button#submit:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #00eaff;
+        }
+
+        #result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.8em;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Simulazione Concorso Operatore Socio Sanitario </h1>
+        <div class="question-nav" id="questionNav"></div>
+        <div id="timer">Tempo rimanente: <span id="time">30:00</span></div>
+        <div id="quiz"></div>
+        <div class="navigation">
+            <button class="nav-button" id="prev" disabled>⬅ Indietro</button>
+            <button class="nav-button" id="next">Avanti ➡</button>
+        </div>
+        <button id="submit">Invia Risposte</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Array di 30 nuove domande con spiegazioni professionali ed esaustive
+        const questions = [
+            {
+                question: "Quale tra le seguenti attività NON rientra nelle competenze dell’OSS?",
+                options: ["Aiutare il paziente a lavarsi", "Somministrare farmaci per via endovenosa", "Supportare il paziente nella deambulazione", "Pulire l’ambiente dell’assistito"],
+                correct: "Somministrare farmaci per via endovenosa",
+                explanation: "La somministrazione di farmaci per via endovenosa è una competenza esclusiva del personale infermieristico, regolata dal D.M. 739/1994, che definisce il profilo professionale dell’infermiere. L’Operatore Socio Sanitario (OSS), secondo l’Accordo Stato-Regioni del 22 febbraio 2001, può supportare attività di assistenza di base come l’igiene personale, la mobilizzazione e la pulizia dell’ambiente, ma non ha l’autonomia né la formazione per eseguire procedure invasive o gestire terapie farmacologiche complesse. Tale attività richiede conoscenze specifiche di farmacologia, gestione delle vie di accesso venoso e monitoraggio delle reazioni avverse, che esulano dal profilo dell’OSS."
+            },
+            {
+                question: "Quale strumento utilizza l’OSS per misurare la saturazione di ossigeno nel sangue?",
+                options: ["Sfigmomanometro", "Saturimetro", "Termometro", "Elettrocardiografo"],
+                correct: "Saturimetro",
+                explanation: "Il saturimetro è lo strumento utilizzato per misurare la saturazione di ossigeno nel sangue (SpO2) in modo non invasivo, posizionandolo generalmente sul dito del paziente. L’OSS è autorizzato a utilizzarlo per monitorare parametri vitali di base, come previsto dal suo profilo professionale (Accordo Stato-Regioni 2001), sotto la supervisione dell’infermiere. Lo sfigmomanometro misura la pressione arteriosa, il termometro la temperatura corporea e l’elettrocardiografo registra l’attività elettrica del cuore, ma nessuno di questi è specifico per la saturazione di ossigeno."
+            },
+            {
+                question: "Quale posizione è più indicata per un paziente con difficoltà respiratorie?",
+                options: ["Supina", "Prone", "Fowler (semi-seduta)", "Laterale"],
+                correct: "Fowler (semi-seduta)",
+                explanation: "La posizione Fowler, o semi-seduta (con il tronco inclinato tra 30° e 60°), è raccomandata per i pazienti con difficoltà respiratorie, come in caso di dispnea o edema polmonare. Questa posizione facilita l’espansione polmonare e riduce la pressione sugli organi toracici, migliorando la ventilazione. La posizione supina può peggiorare la respirazione in presenza di secrezioni o ostruzioni, mentre la posizione prona è usata in casi specifici (es. ARDS) sotto controllo medico. La posizione laterale è utile per il drenaggio, ma non è ottimale per la respirazione in generale."
+            },
+            {
+                question: "Cosa deve fare l’OSS in caso di caduta accidentale di un paziente?",
+                options: ["Sollevare immediatamente il paziente", "Valutare lo stato del paziente e segnalare all’infermiere", "Ignorare l’evento se il paziente sembra stare bene", "Chiamare i familiari"],
+                correct: "Valutare lo stato del paziente e segnalare all’infermiere",
+                explanation: "In caso di caduta, l’OSS deve prima valutare lo stato del paziente (coscienza, presenza di lesioni, dolore) senza muoverlo immediatamente, per evitare di aggravare eventuali traumi, come fratture o lesioni spinali. Successivamente, deve segnalare l’accaduto all’infermiere o al medico, secondo le procedure di sicurezza previste dal SSN e dal profilo OSS (Accordo Stato-Regioni 2001). Sollevare il paziente senza valutazione è rischioso, ignorare l’evento è negligente e contattare i familiari non è una priorità immediata rispetto all’intervento sanitario."
+            },
+            {
+                question: "Quale tra questi è un segno di disidratazione in un paziente?",
+                options: ["Pelle umida e fresca", "Bocca secca e sete intensa", "Aumento della diuresi", "Pressione arteriosa elevata"],
+                correct: "Bocca secca e sete intensa",
+                explanation: "La disidratazione si manifesta con segni come bocca secca, sete intensa, riduzione dell’elasticità cutanea (segno della plica), urine scarse e concentrate, e possibile confusione mentale. È una condizione comune negli anziani o in pazienti con febbre, diarrea o vomito, e richiede un monitoraggio attento da parte dell’OSS per segnalare eventuali peggioramenti. La pelle umida indica idratazione normale o sudorazione, l’aumento della diuresi è opposto alla disidratazione e la pressione elevata non è un segno diretto."
+            },
+            {
+                question: "Quale procedura deve seguire l’OSS per il lavaggio delle mani?",
+                options: ["Usare solo acqua calda", "Frizione con sapone per almeno 40-60 secondi", "Sciacquare rapidamente senza sapone", "Asciugare con un panno sporco"],
+                correct: "Frizione con sapone per almeno 40-60 secondi",
+                explanation: "Il lavaggio delle mani è una misura fondamentale per prevenire le infezioni nosocomiali, regolata dalle linee guida del Ministero della Salute e del WHO. L’OSS deve frizionare le mani con sapone per almeno 40-60 secondi, coprendo tutte le superfici (palmi, dorsi, dita, unghie), risciacquare con acqua e asciugare con carta monouso o un asciugamano pulito. L’uso di sola acqua non rimuove i microrganismi, un lavaggio rapido è inefficace e un panno sporco reintroduce contaminazione."
+            },
+            {
+                question: "Quale è il compito dell’OSS nella gestione dei rifiuti sanitari?",
+                options: ["Smaltirli direttamente nei cassonetti pubblici", "Segnalare all’infermiere senza intervenire", "Raccolta e smaltimento nei contenitori appropriati", "Lasciarli nella stanza del paziente"],
+                correct: "Raccolta e smaltimento nei contenitori appropriati",
+                explanation: "L’OSS ha il compito di raccogliere e smaltire i rifiuti sanitari (es. garze, aghi, materiali contaminati) nei contenitori specifici, come previsto dal DPR 254/2003 sulla gestione dei rifiuti sanitari. Questo include l’uso di contenitori per rifiuti pericolosi a rischio infettivo, taglienti o chimici, garantendo sicurezza e prevenzione delle infezioni. Smaltirli nei cassonetti pubblici è illegale, segnalare senza agire non è sufficiente e lasciarli nella stanza è un rischio igienico."
+            },
+            {
+                question: "Quale tra questi è un dispositivo di protezione individuale (DPI) usato dall’OSS?",
+                options: ["Guanti monouso", "Stetoscopio", "Saturimetro", "Termometro"],
+                correct: "Guanti monouso",
+                explanation: "I guanti monouso sono un dispositivo di protezione individuale (DPI) essenziale per l’OSS, utilizzati per proteggere sia l’operatore che il paziente durante procedure come l’igiene personale o la gestione di materiali biologici, secondo il D.Lgs. 81/2008 sulla sicurezza sul lavoro. Stetoscopio, saturimetro e termometro sono strumenti di misurazione, non DPI, e non offrono protezione contro rischi biologici o chimici."
+            },
+            {
+                question: "Quale è la funzione principale del materasso antidecubito?",
+                options: ["Migliorare il comfort del paziente", "Prevenire le lesioni da pressione", "Facilitare la deambulazione", "Raffreddare il corpo"],
+                correct: "Prevenire le lesioni da pressione",
+                explanation: "Il materasso antidecubito è progettato per prevenire le lesioni da pressione (piaghe da decubito) nei pazienti allettati o con mobilità ridotta, ridistribuendo il peso corporeo e migliorando la circolazione sanguigna nelle aree a rischio (es. sacro, talloni). Funziona alternando la pressione attraverso celle d’aria o materiali speciali, come indicato nelle linee guida per la prevenzione delle ulcere da pressione (EPUAP/NPUAP). Il comfort è un beneficio secondario, ma non la funzione primaria."
+            },
+            {
+                question: "Quale tra questi è un sintomo di ipoglicemia?",
+                options: ["Sete intensa", "Sudorazione fredda e tremori", "Aumento della temperatura corporea", "Dolore addominale"],
+                correct: "Sudorazione fredda e tremori",
+                explanation: "L’ipoglicemia, ovvero un livello di glucosio nel sangue inferiore a 70 mg/dL, si manifesta con sintomi neuroglicopenici e adrenergici come sudorazione fredda, tremori, ansia, confusione e fame improvvisa. È una condizione comune nei pazienti diabetici trattati con insulina o ipoglicemizzanti orali. La sete intensa è tipica dell’iperglicemia, l’aumento della temperatura non è correlato e il dolore addominale è aspecifico."
+            },
+            {
+                question: "Quale è il primo passo nella mobilizzazione di un paziente allettato?",
+                options: ["Sollevare il paziente senza preavviso", "Valutare la capacità del paziente", "Usare un sollevatore senza verifica", "Chiedere al paziente di alzarsi da solo"],
+                correct: "Valutare la capacità del paziente",
+                explanation: "Prima di mobilizzare un paziente allettato, l’OSS deve valutare la sua capacità fisica (forza muscolare, equilibrio, stato di coscienza) e le eventuali controindicazioni (es. fratture, dolore acuto), come previsto dalle linee guida di sicurezza e dal profilo OSS. Questo passaggio previene infortuni sia per il paziente che per l’operatore. Sollevare senza valutazione o usare un sollevatore senza verifica è rischioso, mentre chiedere al paziente di alzarsi da solo ignora il suo stato di dipendenza."
+            },
+            {
+                question: "Quale tra questi è un segnale di infezione in una ferita?",
+                options: ["Arrossamento e gonfiore", "Pelle fresca e asciutta", "Assenza di dolore", "Colore roseo uniforme"],
+                correct: "Arrossamento e gonfiore",
+                explanation: "Un’infezione in una ferita si manifesta con segni classici come arrossamento (eritema), gonfiore (edema), calore locale, dolore e possibile secrezione purulenta, secondo le linee guida del Ministero della Salute sulla gestione delle ferite. Questi sintomi indicano una risposta infiammatoria a batteri o altri patogeni. Pelle fresca e asciutta o colore roseo sono segni di guarigione, mentre l’assenza di dolore non esclude un’infezione, soprattutto in pazienti immunocompromessi."
+            },
+            {
+                question: "Quale è la temperatura corporea normale misurata per via ascellare?",
+                options: ["36-37°C", "37-38°C", "35-36°C", "38-39°C"],
+                correct: "36-37°C",
+                explanation: "La temperatura corporea normale, misurata per via ascellare, è compresa tra 36°C e 37°C, secondo le linee guida cliniche standard. È leggermente inferiore rispetto alla misurazione rettale (36,6-38°C) o orale (36,6-37,6°C) a causa della minore vascolarizzazione dell’area ascellare. Valori sopra 37,5°C indicano febbre, mentre sotto 36°C possono suggerire ipotermia, richiedendo attenzione da parte dell’OSS per segnalare anomalie."
+            },
+            {
+                question: "Quale tra questi è un compito dell’OSS nella somministrazione dei pasti?",
+                options: ["Preparare il piano alimentare", "Verificare eventuali allergie o diete speciali", "Somministrare integratori senza prescrizione", "Decidere la quantità di cibo"],
+                correct: "Verificare eventuali allergie o diete speciali",
+                explanation: "L’OSS ha il compito di verificare eventuali allergie o diete speciali prima di somministrare i pasti, consultando la documentazione del paziente o le indicazioni dell’infermiere, come previsto dal suo profilo professionale. Questo garantisce la sicurezza alimentare e il rispetto delle prescrizioni mediche. Preparare il piano alimentare o decidere la quantità di cibo è competenza del dietista o del medico, mentre somministrare integratori senza prescrizione è vietato."
+            },
+            {
+                question: "Quale è la funzione del catetere vescicale?",
+                options: ["Misurare la pressione arteriosa", "Drenare l’urina dalla vescica", "Somministrare farmaci", "Monitorare la temperatura"],
+                correct: "Drenare l’urina dalla vescica",
+                explanation: "Il catetere vescicale è un dispositivo medico inserito nell’uretra per drenare l’urina dalla vescica in pazienti con ritenzione urinaria, incontinenza o necessità di monitoraggio della diuresi (es. post-chirurgia). L’OSS può collaborare nella gestione del catetere (es. svuotare il sacco di raccolta) sotto supervisione, ma non lo inserisce né lo rimuove, compiti riservati all’infermiere. Non ha funzioni legate a pressione, farmaci o temperatura."
+            },
+            {
+                question: "Quale tra questi è un rischio per un paziente allettato?",
+                options: ["Aumento della forza muscolare", "Formazione di piaghe da decubito", "Miglioramento della circolazione", "Riduzione della stanchezza"],
+                correct: "Formazione di piaghe da decubito",
+                explanation: "I pazienti allettati sono a rischio di piaghe da decubito (ulcere da pressione) a causa della pressione prolungata su aree come sacro, talloni e fianchi, che compromette la circolazione sanguigna e causa necrosi tissutale. Questo rischio è documentato nelle linee guida EPUAP/NPUAP ed è prevenibile con cambi di posizione regolari (ogni 2 ore) e dispositivi antidecubito. Gli altri effetti elencati non sono rischi, ma benefici improbabili in un paziente immobile."
+            },
+            {
+                question: "Quale è il primo intervento dell’OSS in caso di soffocamento?",
+                options: ["Chiamare immediatamente il medico", "Eseguire la manovra di Heimlich", "Battere sulla schiena del paziente", "Somministrare acqua"],
+                correct: "Battere sulla schiena del paziente",
+                explanation: "In caso di soffocamento, il primo intervento dell’OSS è eseguire 5 colpi interscapolari (battendo sulla schiena tra le scapole) per tentare di disostruire le vie aeree, come previsto dalle linee guida di primo soccorso per personale non medico (es. IRC). Se inefficace, si passa alla manovra di Heimlich, ma questa richiede formazione specifica e non è sempre autorizzata per l’OSS. Chiamare il medico è successivo, mentre somministrare acqua è controindicato e pericoloso."
+            },
+            {
+                question: "Quale tra questi è un segno di iperglicemia?",
+                options: ["Sudorazione fredda", "Sete intensa e poliuria", "Tremori e confusione", "Pallore improvviso"],
+                correct: "Sete intensa e poliuria",
+                explanation: "L’iperglicemia, con glicemia superiore a 180 mg/dL, si manifesta con sete intensa (polidipsia), aumento della diuresi (poliuria) e stanchezza, dovuti all’incapacità del corpo di utilizzare il glucosio e alla perdita di liquidi. È tipica del diabete non controllato. Sudorazione fredda, tremori e confusione sono segni di ipoglicemia, mentre il pallore non è specifico. L’OSS deve riconoscere questi sintomi per segnalarli tempestivamente."
+            },
+            {
+                question: "Quale è la posizione corretta per un paziente con reflusso gastroesofageo?",
+                options: ["Supina", "Testa rialzata di 30-45°", "Prone", "Laterale sinistra"],
+                correct: "Testa rialzata di 30-45°",
+                explanation: "Per i pazienti con reflusso gastroesofageo (GERD), la posizione con la testa rialzata di 30-45° (posizione Fowler bassa) riduce la risalita di acido dallo stomaco all’esofago, sfruttando la gravità. È raccomandata dalle linee guida cliniche per migliorare i sintomi e prevenire complicanze come l’esofagite. La posizione supina o prona peggiora il reflusso, mentre la laterale sinistra può essere utile ma non è ottimale come la Fowler."
+            },
+            {
+                question: "Quale tra questi è un compito dell’OSS nella gestione dell’igiene orale?",
+                options: ["Spazzolare i denti del paziente", "Diagnosticare carie", "Prescrivere collutori", "Eseguire otturazioni"],
+                correct: "Spazzolare i denti del paziente",
+                explanation: "L’OSS ha il compito di assistere il paziente nell’igiene orale, come spazzolare i denti o utilizzare presidi (es. collutori) su indicazione dell’infermiere, secondo il profilo professionale (Accordo Stato-Regioni 2001). Questo previene infezioni e mantiene la salute orale, specie nei pazienti non autosufficienti. Diagnosticare carie, prescrivere collutori o eseguire otturazioni sono competenze riservate a odontoiatri o medici."
+            },
+            {
+                question: "Quale è la frequenza respiratoria normale in un adulto a riposo?",
+                options: ["12-20 atti al minuto", "20-30 atti al minuto", "8-12 atti al minuto", "30-40 atti al minuto"],
+                correct: "12-20 atti al minuto",
+                explanation: "La frequenza respiratoria normale in un adulto a riposo è compresa tra 12 e 20 atti al minuto, secondo i parametri vitali standard (fonte: linee guida cliniche SSN). L’OSS può misurarla contando i movimenti toracici per un minuto, segnalando anomalie (tachipnea >20 o bradipnea <12) all’infermiere. Valori più alti o più bassi possono indicare distress respiratorio, infezioni o altre patologie."
+            },
+            {
+                question: "Quale tra questi è un segnale di distress respiratorio?",
+                options: ["Respiro regolare e profondo", "Respiro rapido e superficiale", "Assenza di rumori respiratori", "Colorito roseo"],
+                correct: "Respiro rapido e superficiale",
+                explanation: "Il respiro rapido e superficiale (tachipnea) è un segnale di distress respiratorio, spesso associato a condizioni come polmonite, edema polmonare o ansia grave. Indica uno sforzo del corpo per compensare una ridotta ossigenazione. Il respiro regolare è normale, l’assenza di rumori può suggerire un’ostruzione totale (emergenza), e il colorito roseo è un segno di buona ossigenazione, non di distress."
+            },
+            {
+                question: "Quale è il compito dell’OSS prima di utilizzare un sollevatore meccanico?",
+                options: ["Controllare lo stato delle cinghie e del dispositivo", "Sollevare il paziente senza verifica", "Chiedere al paziente di collaborare", "Usare il dispositivo senza istruzioni"],
+                correct: "Controllare lo stato delle cinghie e del dispositivo",
+                explanation: "Prima di utilizzare un sollevatore meccanico, l’OSS deve controllare lo stato delle cinghie, dei ganci e del dispositivo per garantire la sicurezza del paziente e dell’operatore, come previsto dal D.Lgs. 81/2008 sulla sicurezza sul lavoro e dalle istruzioni del produttore. Questo previene malfunzionamenti o incidenti. Usare il dispositivo senza verifica o istruzioni è pericoloso, mentre chiedere collaborazione al paziente è secondario alla sicurezza tecnica."
+            },
+            {
+                question: "Quale tra questi è un sintomo di stitichezza?",
+                options: ["Difficoltà nell’evacuazione", "Diarrea frequente", "Aumento dell’appetito", "Urine abbondanti"],
+                correct: "Difficoltà nell’evacuazione",
+                explanation: "La stitichezza (o costipazione) si manifesta con difficoltà nell’evacuazione, feci dure e rare (meno di 3 volte a settimana), spesso accompagnate da dolore addominale. È comune nei pazienti allettati o con diete povere di fibre. La diarrea è l’opposto, l’aumento dell’appetito non è correlato e le urine abbondanti riguardano la diuresi, non l’intestino."
+            },
+            {
+                question: "Quale è la procedura corretta per la misurazione della pressione arteriosa?",
+                options: ["Posizionare il bracciale sopra i vestiti", "Misurare dopo un’attività fisica intensa", "Posizionare il bracciale al livello del cuore", "Stringere il bracciale senza gonfiarlo"],
+                correct: "Posizionare il bracciale al livello del cuore",
+                explanation: "Per misurare correttamente la pressione arteriosa con uno sfigmomanometro, l’OSS deve posizionare il bracciale sul braccio nudo, all’altezza del cuore, per garantire una lettura accurata, come indicato dalle linee guida cliniche (es. AHA). Misurare sopra i vestiti o dopo attività fisica altera i valori, mentre stringere senza gonfiare non permette la rilevazione."
+            },
+            {
+                question: "Quale tra questi è un compito dell’OSS nella gestione di un paziente agitato?",
+                options: ["Parlare con calma e rassicurarlo", "Usare la forza per immobilizzarlo", "Ignorarlo fino a che si calma", "Somministrare un sedativo"],
+                correct: "Parlare con calma e rassicurarlo",
+                explanation: "L’OSS deve gestire un paziente agitato parlando con calma, usando un tono rassicurante e cercando di comprenderne le cause (es. dolore, paura), come previsto dalle tecniche di comunicazione del profilo OSS. L’uso della forza è vietato salvo situazioni estreme e autorizzate, ignorarlo è inefficace e somministrare sedativi è competenza medica, non dell’OSS."
+            },
+            {
+                question: "Quale è il rischio di una cattiva igiene orale?",
+                options: ["Infezioni gengivali e carie", "Miglioramento della respirazione", "Riduzione del dolore", "Aumento della forza muscolare"],
+                correct: "Infezioni gengivali e carie",
+                explanation: "Una cattiva igiene orale favorisce la proliferazione di batteri nella bocca, portando a infezioni gengivali (es. gengivite, parodontite) e carie dentali, secondo le linee guida dell’OMS sulla salute orale. Nei pazienti non autosufficienti, può anche causare complicanze sistemiche come polmonite da aspirazione. Gli altri effetti elencati non sono correlati all’igiene orale."
+            },
+            {
+                question: "Quale tra questi è un segno di anemia?",
+                options: ["Pallore e stanchezza", "Rossore al viso", "Aumento della pressione", "Sete intensa"],
+                correct: "Pallore e stanchezza",
+                explanation: "L’anemia, caratterizzata da una riduzione dei globuli rossi o dell’emoglobina, si manifesta con pallore (dovuto a minore ossigenazione dei tessuti), stanchezza, debolezza e possibile tachicardia. È comune in carenze di ferro, vitamina B12 o emorragie. Il rossore al viso e l’aumento della pressione non sono tipici, mentre la sete intensa è legata a disidratazione o iperglicemia."
+            },
+            {
+                question: "Quale è il primo passo nel primo soccorso in caso di arresto cardiaco?",
+                options: ["Valutare la sicurezza della scena", "Iniziare il massaggio cardiaco", "Chiamare il 118 senza verificare", "Somministrare ossigeno"],
+                correct: "Valutare la sicurezza della scena",
+                explanation: "Nel primo soccorso, il primo passo è valutare la sicurezza della scena per proteggere sé stessi e il paziente da pericoli (es. traffico, elettricità), come previsto dalle linee guida IRC e AHA. Solo dopo si verifica la risposta del paziente e si chiama il 118, iniziando il massaggio cardiaco se necessario. Somministrare ossigeno non è un compito dell’OSS senza attrezzature specifiche."
+            },
+            {
+                question: "Quale tra questi è un compito dell’OSS nella prevenzione delle cadute?",
+                options: ["Mantenere il pavimento asciutto e libero", "Lasciare oggetti sparsi nella stanza", "Spegnere tutte le luci", "Ignorare le richieste del paziente"],
+                correct: "Mantenere il pavimento asciutto e libero",
+                explanation: "L’OSS contribuisce alla prevenzione delle cadute mantenendo il pavimento asciutto, libero da ostacoli e ben illuminato, come previsto dal D.Lgs. 81/2008 sulla sicurezza e dal profilo professionale. Questo riduce i rischi per i pazienti con mobilità ridotta. Lasciare oggetti sparsi o spegnere le luci aumenta il pericolo, mentre ignorare le richieste non è un intervento preventivo."
+            }
+        ];
+
+        let currentQuestion = 0;
+
+        // Carica i quadratini di navigazione
+        function loadQuestionNav() {
+            const navDiv = document.getElementById("questionNav");
+            questions.forEach((_, index) => {
+                const box = document.createElement("div");
+                box.classList.add("question-box");
+                box.textContent = index + 1;
+                box.addEventListener("click", () => {
+                    showQuestion(index);
+                });
+                navDiv.appendChild(box);
+            });
+        }
+
+        // Carica il quiz
+        function loadQuiz() {
+            const quizDiv = document.getElementById("quiz");
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement("div");
+                questionDiv.classList.add("question");
+                questionDiv.id = `question-${index}`;
+                questionDiv.innerHTML = `
+                    <h3>${index + 1}. ${q.question}</h3>
+                    ${q.options.map((opt, i) => `
+                        <div class="option" data-value="${opt}">
+                            <input type="radio" name="q${index}" value="${opt}" id="q${index}_${i}">
+                            <label for="q${index}_${i}">${opt}</label>
+                            <span class="lamp" id="lamp-${index}-${i}">💡</span>
+                        </div>
+                    `).join("")}
+                    <div class="explanation" id="exp-${index}">${q.explanation}</div>
+                `;
+                quizDiv.appendChild(questionDiv);
+
+                // Aggiungi evento per accendere il quadratino
+                const radios = questionDiv.querySelectorAll(`input[name="q${index}"]`);
+                radios.forEach(radio => {
+                    radio.addEventListener("change", () => {
+                        document.querySelectorAll(".question-box")[index].classList.add("answered");
+                    });
+                });
+            });
+            showQuestion(0); // Mostra la prima domanda
+        }
+
+        // Mostra la domanda corrente
+        function showQuestion(index) {
+            document.querySelectorAll(".question").forEach(q => q.classList.remove("active"));
+            document.getElementById(`question-${index}`).classList.add("active");
+            currentQuestion = index;
+
+            // Gestione stato pulsanti
+            document.getElementById("prev").disabled = currentQuestion === 0;
+            document.getElementById("next").disabled = currentQuestion === questions.length - 1;
+        }
+
+        // Timer (30 minuti)
+        let timeLeft = 30 * 60;
+        function startTimer() {
+            const timer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById("time").textContent = 
+                    `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    checkAnswers();
+                }
+            }, 1000);
+        }
+
+        // Controllo risposte e feedback visivo
+        function checkAnswers() {
+            let score = 0;
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const options = document.querySelectorAll(`#question-${index} .option`);
+
+                options.forEach(option => {
+                    const value = option.getAttribute("data-value");
+                    if (value === q.correct) {
+                        option.classList.add("correct");
+                        const lamp = option.querySelector(".lamp");
+                        lamp.style.display = "inline";
+                        lamp.addEventListener("click", () => {
+                            const explanation = document.getElementById(`exp-${index}`);
+                            explanation.style.display = "block";
+                        });
+                    }
+                });
+
+                if (selected) {
+                    if (selected.value === q.correct) {
+                        score++;
+                    } else {
+                        selected.parentElement.classList.add("wrong");
+                    }
+                }
+            });
+
+            const resultDiv = document.getElementById("result");
+            resultDiv.textContent = `Punteggio: ${score} / ${questions.length}`;
+            document.getElementById("submit").disabled = true;
+            document.getElementById("prev").disabled = true;
+            document.getElementById("next").disabled = true;
+
+            // Disabilita i radio button dopo l'invio
+            document.querySelectorAll("input[type=radio]").forEach(radio => {
+                radio.disabled = true;
+            });
+        }
+
+        // Inizializzazione
+        window.onload = () => {
+            loadQuestionNav();
+            loadQuiz();
+            startTimer();
+
+            document.getElementById("prev").addEventListener("click", () => {
+                if (currentQuestion > 0) showQuestion(currentQuestion - 1);
+            });
+
+            document.getElementById("next").addEventListener("click", () => {
+                if (currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1);
+            });
+
+            document.getElementById("submit").addEventListener("click", checkAnswers);
+        };
+    </script>
+</body>
+</html>
